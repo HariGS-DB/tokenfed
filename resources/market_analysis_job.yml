@@ -5,14 +5,21 @@ resources:
       
       tasks:
         - task_key: run_market_analysis
-          notebook_task:
-            notebook_path: ../notebooks/market_analysis.py
-            source: WORKSPACE
-          
           sql_task:
             warehouse_id: ${var.warehouse_id}
-          
-          libraries: []
+            query:
+              query: |
+                SELECT
+                  dim_company.city,
+                  AVG(fact_markethistory.yield) AS average_yield
+                FROM
+                  tpcdi.gold_market.fact_markethistory
+                    JOIN tpcdi.gold_market.dim_company
+                      ON fact_markethistory.sk_companyid = dim_company.sk_companyid
+                GROUP BY
+                  dim_company.city
+                ORDER BY
+                  average_yield DESC
           
           timeout_seconds: 300
       
