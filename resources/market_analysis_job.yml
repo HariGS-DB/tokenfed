@@ -1,0 +1,19 @@
+resources:
+  jobs:
+    market_analysis:
+      name: "Market Analysis - Average Yield by City"
+      
+      tasks:
+        - task_key: run_market_analysis
+          notebook_task:
+            notebook_path: ../notebooks/market_analysis.py
+            source: WORKSPACE
+          
+          sql_task:
+            warehouse_id: ${var.warehouse_id}
+          
+          libraries: []
+          
+          timeout_seconds: 300
+      
+      
