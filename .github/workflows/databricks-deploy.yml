@@ -39,7 +39,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    
+    environment:dev
     env:
       DATABRICKS_AUTH_TYPE: github-oidc
       DATABRICKS_HOST: https://dbc-0bff3115-71d9.cloud.databricks.com/
@@ -61,7 +61,7 @@ jobs:
       
       - name: Run Databricks CLI commands
         run: databricks current-user me
-        
+
       - name: Deploy DABS Bundle
         run: |
           # Set the target environment
