@@ -59,6 +59,9 @@ jobs:
           pip install databricks-cli
           databricks --version
       
+      - name: Run Databricks CLI commands
+        run: databricks current-user me
+        
       - name: Deploy DABS Bundle
         run: |
           # Set the target environment
