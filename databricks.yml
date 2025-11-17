@@ -1,0 +1,23 @@
+# Databricks Asset Bundle Configuration
+bundle:
+  name: tokenfed-market-analysis
+
+include:
+  - resources/*.yml
+
+# Variables that can be overridden
+variables:
+  warehouse_id:
+    description: "The SQL Warehouse ID to use for queries"
+    default: "ec354449db0ae20a"
+
+targets:
+  # Development target
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: ${var.databricks_host}
+    
+
+
