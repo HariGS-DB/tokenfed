@@ -62,7 +62,7 @@ jobs:
       - name: Deploy DABS Bundle
         run: |
           # Set the target environment
-          TARGET="${{ inputs.environment}}"
+          TARGET="${{ inputs.environment }}"
           
           # Set variables
           export TF_VAR_databricks_host="${{ inputs.databricks_host }}"
@@ -77,7 +77,7 @@ jobs:
       - name: Run Job
         id: run_job
         run: |
-          TARGET="${{ inputs.environment || 'dev' }}"
+          TARGET="${{ inputs.environment }}"
           
           echo "Running the deployed job..."
           
