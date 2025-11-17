@@ -8,8 +8,12 @@ include:
 # Variables that can be overridden
 variables:
   warehouse_id:
-    description: "The SQL Warehouse ID to use for queries"
+    description: "The SQL Warehouse ID to use for SQL queries"
     default: "ec354449db0ae20a"
+  
+  databricks_host:
+    description: "Databricks workspace URL"
+    default: "https://dbc-0bff3115-71d9.cloud.databricks.com"
 
 targets:
   # Development target
@@ -17,7 +21,6 @@ targets:
     mode: development
     default: true
     workspace:
-      host: https://dbc-0bff3115-71d9.cloud.databricks.com
-    
+      host: ${var.databricks_host}
 
 
