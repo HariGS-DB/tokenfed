@@ -13,9 +13,7 @@ on:
         description: 'Target environment'
         required: true
         type: choice
-        options:
-          - dev
-          - prod
+        default:'dev'
         default: 'dev'
       warehouse_id:
         description: 'SQL Warehouse ID (optional, uses default if not provided)'
