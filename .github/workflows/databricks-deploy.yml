@@ -44,7 +44,6 @@ jobs:
       DATABRICKS_AUTH_TYPE: github-oidc
       DATABRICKS_HOST: https://dbc-0bff3115-71d9.cloud.databricks.com/
       DATABRICKS_CLIENT_ID: 0fb7894e-ecb6-4ab6-b5ab-2b1e09397949
-      DATABRICKS_CLI_LOG_LEVEL: debug
       
     steps:
       - name: Checkout code
@@ -54,7 +53,7 @@ jobs:
         uses: databricks/setup-cli@main
       
       - name: Run Databricks CLI commands
-        run: databricks current-user me --debug
+        run: databricks current-user me
 
       - name: Deploy DABS Bundle
         run: |
@@ -66,10 +65,10 @@ jobs:
           export TF_VAR_warehouse_id="${{ inputs.warehouse_id }}"
           
           # Validate the bundle
-          databricks bundle validate -t $TARGET --debug
+          databricks bundle validate -t $TARGET
           
           # Deploy the bundle
-          databricks bundle deploy -t $TARGET --debug
+          databricks bundle deploy -t $TARGET
       
       - name: Run Job
         id: run_job
@@ -79,7 +78,7 @@ jobs:
           echo "Running the deployed job..."
           
           # Run the job and capture the run ID
-          RUN_OUTPUT=$(databricks bundle run market_analysis -t $TARGET --debug)
+          RUN_OUTPUT=$(databricks bundle run market_analysis -t $TARGET)
           echo "$RUN_OUTPUT"
           
           # Extract run ID (adjust based on actual output format)
