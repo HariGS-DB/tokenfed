@@ -17,7 +17,7 @@ targets:
     mode: development
     default: true
     workspace:
-      host: ${var.databricks_host}
+      host: https://dbc-0bff3115-71d9.cloud.databricks.com
     
 
 
