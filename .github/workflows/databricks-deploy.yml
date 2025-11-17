@@ -8,6 +8,7 @@ on:
         description: 'Databricks Workspace URL (e.g., https://dbc-xxxxx.cloud.databricks.com)'
         required: true
         type: string
+        default: 'https://dbc-0bff3115-71d9.cloud.databricks.com/'
       environment:
         description: 'Target environment'
         required: true
@@ -21,11 +22,6 @@ on:
         required: false
         type: string
         default: 'ec354449db0ae20a'
-      run_job:
-        description: 'Run the job after deployment?'
-        required: true
-        type: boolean
-        default: true
 
   # Automatic trigger on push to main branch
   push:
@@ -42,9 +38,15 @@ jobs:
     name: Deploy to Databricks
     runs-on: ubuntu-latest
     
+    # Required for OIDC token
+    permissions:
+      id-token: write
+      contents: read
+    
     env:
-      DATABRICKS_HOST: ${{ inputs.databricks_host || secrets.DATABRICKS_HOST }}
-      DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+      DATABRICKS_AUTH_TYPE: github-oidc
+      DATABRICKS_HOST: https://dbc-0bff3115-71d9.cloud.databricks.com/
+      DATABRICKS_CLIENT_ID: 0fb7894e-ecb6-4ab6-b5ab-2b1e09397949
       
     steps:
       - name: Checkout code
@@ -60,21 +62,14 @@ jobs:
           pip install databricks-cli
           databricks --version
       
-      - name: Validate Databricks Connection
-        run: |
-          echo "Validating connection to: $DATABRICKS_HOST"
-          databricks workspace ls /
-      
       - name: Deploy DABS Bundle
         run: |
           # Set the target environment
-          TARGET="${{ inputs.environment || 'dev' }}"
+          TARGET="${{ inputs.environment}}"
           
           # Set variables
-          export TF_VAR_databricks_host="${DATABRICKS_HOST}"
-          export TF_VAR_warehouse_id="${{ inputs.warehouse_id || 'ec354449db0ae20a' }}"
-          
-          echo "Deploying to $TARGET environment..."
+          export TF_VAR_databricks_host="${{ inputs.databricks_host }}"
+          export TF_VAR_warehouse_id="${{ inputs.warehouse_id }}"
           
           # Validate the bundle
           databricks bundle validate -t $TARGET
@@ -83,7 +78,6 @@ jobs:
           databricks bundle deploy -t $TARGET
       
       - name: Run Job (if enabled)
-        if: ${{ inputs.run_job == true || github.event_name == 'push' }}
         id: run_job
         run: |
           TARGET="${{ inputs.environment || 'dev' }}"
@@ -100,99 +94,4 @@ jobs:
           
           echo "Job triggered with Run ID: $RUN_ID"
       
-      - name: Wait for Job Completion
-        if: ${{ (inputs.run_job == true || github.event_name == 'push') && steps.run_job.outputs.run_id != 'unknown' }}
-        run: |
-          RUN_ID="${{ steps.run_job.outputs.run_id }}"
-          TARGET="${{ inputs.environment || 'dev' }}"
-          
-          echo "Waiting for job run $RUN_ID to complete..."
-          
-          MAX_WAIT=600  # 10 minutes
-          ELAPSED=0
-          INTERVAL=10
-          
-          while [ $ELAPSED -lt $MAX_WAIT ]; do
-            # Get run status
-            STATUS=$(databricks runs get --run-id $RUN_ID | jq -r '.state.life_cycle_state')
-            RESULT=$(databricks runs get --run-id $RUN_ID | jq -r '.state.result_state // "RUNNING"')
-            
-            echo "Status: $STATUS, Result: $RESULT"
-            
-            if [ "$STATUS" = "TERMINATED" ]; then
-              if [ "$RESULT" = "SUCCESS" ]; then
-                echo "✅ Job completed successfully!"
-                exit 0
-              else
-                echo "❌ Job failed with result: $RESULT"
-                exit 1
-              fi
-            fi
-            
-            sleep $INTERVAL
-            ELAPSED=$((ELAPSED + INTERVAL))
-          done
-          
-          echo "⚠️ Job did not complete within timeout"
-          exit 1
-      
-      - name: Get Job Results
-        if: success()
-        run: |
-          RUN_ID="${{ steps.run_job.outputs.run_id }}"
-          
-          if [ "$RUN_ID" != "unknown" ]; then
-            echo "Fetching job results..."
-            databricks runs get-output --run-id $RUN_ID
-          fi
-      
-      - name: Create Deployment Summary
-        if: always()
-        run: |
-          cat >> $GITHUB_STEP_SUMMARY << EOF
-          ## 🚀 Databricks Deployment Summary
-          
-          **Environment:** \`${{ inputs.environment || 'dev' }}\`
-          **Workspace:** \`${DATABRICKS_HOST}\`
-          **Warehouse ID:** \`${{ inputs.warehouse_id || 'ec354449db0ae20a' }}\`
-          
-          ### Deployment Status
-          - Bundle validation: ✅
-          - Bundle deployment: ✅
-          EOF
-          
-          if [ "${{ steps.run_job.outputs.run_id }}" != "unknown" ] && [ "${{ steps.run_job.outputs.run_id }}" != "" ]; then
-            cat >> $GITHUB_STEP_SUMMARY << EOF
-          - Job execution: ✅
-          - Run ID: \`${{ steps.run_job.outputs.run_id }}\`
-          
-          [View Run in Databricks](${DATABRICKS_HOST}#job/runs/${{ steps.run_job.outputs.run_id }})
-          EOF
-          fi
-
-  # Optional: Test job for validation
-  test:
-    name: Test Databricks Notebook
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      
-      - name: Install Dependencies
-        run: |
-          pip install databricks-cli
-      
-      - name: Validate Bundle Configuration
-        env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-        run: |
-          databricks bundle validate -t dev
 
