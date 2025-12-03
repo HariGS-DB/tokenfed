@@ -5,7 +5,6 @@ on:
   workflow_dispatch:
     inputs:
       databricks_host:
-        description: 'Databricks Workspace URL (e.g., https://dbc-xxxxx.cloud.databricks.com)'
         required: true
         type: string
         default: 'https://dbc-ac23b2db-d75d.cloud.databricks.com/'
