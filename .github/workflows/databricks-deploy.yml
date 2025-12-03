@@ -42,7 +42,7 @@ jobs:
     environment: dev
     env:
       DATABRICKS_AUTH_TYPE: github-oidc
-      DATABRICKS_HOST: https://dbc-0bff3115-71d9.cloud.databricks.com/
+      DATABRICKS_HOST: https://dbc-ac23b2db-d75d.cloud.databricks.com/
       DATABRICKS_CLIENT_ID: 0fb7894e-ecb6-4ab6-b5ab-2b1e09397949
       
     steps:

@@ -75,8 +75,7 @@ print("\nCurrent Databricks identity:")
 print(f"  user_name: {me.user_name}")
 print(f"  display_name: {me.display_name}")
 print(f"  active: {me.active}")
-
-
+print(w.config.oauth_token())
 # ── List SQL Warehouses via SDK ───────────────────────────────────────────────
 print("\nSQL Warehouses:")
 # In the SDK, this maps to GET /api/2.0/sql/warehouses
