@@ -10,7 +10,7 @@ CLIENT_ID = "2e50ad87-8336-4a04-8817-6aeac7d63390"
 
 
 # FULL workspace URL for the SDK (must include https://)
-DATABRICKS_HOST = "https://dbc-0bff3115-71d9.cloud.databricks.com/"
+DATABRICKS_HOST = "https://dbc-ac23b2db-d75d.cloud.databricks.com/"
 
 
 # Your *custom audience* that your Databricks federation policy allows
@@ -84,7 +84,7 @@ for wh in w.warehouses.list():
 
 
 # ── Execute SQL Query ─────────────────────────────────────────────────────────
-WAREHOUSE_ID = "ec354449db0ae20a"
+WAREHOUSE_ID = "5c7fa00eac31345b"
 SQL_QUERY = """
 SELECT
   dim_company.city,
