@@ -8,7 +8,7 @@ on:
         description: 'Databricks Workspace URL (e.g., https://dbc-xxxxx.cloud.databricks.com)'
         required: true
         type: string
-        default: 'https://dbc-0bff3115-71d9.cloud.databricks.com/'
+        default: 'https://dbc-ac23b2db-d75d.cloud.databricks.com/'
       environment:
         description: 'Target environment'
         required: true
