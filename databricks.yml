@@ -9,7 +9,7 @@ include:
 variables:
   warehouse_id:
     description: "The SQL Warehouse ID to use for SQL queries"
-    default: "ec354449db0ae20a"
+    default: "5c7fa00eac31345b"
   
 
 targets:
